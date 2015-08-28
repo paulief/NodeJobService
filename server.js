@@ -3,6 +3,7 @@ var cors = require('cors'); //Only needed in test environment to bypass cross-or
 var bodyParser = require('body-parser');
 var shortId = require('shortid');
 var request = require('request');
+var Q = require('q');
 //DB SETUP
 var dbConfig = require('config').get('Jobs.dbConfig');
 var pg = require('pg');
@@ -56,7 +57,7 @@ var dbWorker = {
 			if (err) {
 				console.log(err);
 			} else {
-				client.query(insertSql, [jobId, jobOutcome, jobResultBody], function(err, result) {
+				client.query(insertSql, [jobId, jobOutcome, jobResultBody], function(err) {
 					done(); //free the db the connection
 					if (err) {
 						console.log(err);
@@ -68,6 +69,33 @@ var dbWorker = {
 			};
 
 		});
+	},
+	getJobResults: function(jobId) {
+		var selectSql = 'SELECT job_outcome, job_result_body FROM jobs.job_results WHERE job_id = $1';
+		var results = {};
+		var deferred = Q.defer();
+		pg.connect(pgConnString, function(err, client, done) {
+			if (err) {
+				console.log(err);
+			} else {
+				var query = client.query(selectSql, [jobId], function(err) {
+					if (err) {
+						console.log(err);
+					};
+				});
+				query.on('row', function(row) { //will only return one row
+					results.jobOutcome = row.job_outcome;
+					results.jobResultBody = row.job_result_body;
+				});
+				query.on('end', function() {
+					done(); //free the connection
+					console.log("query results - " + results);
+					deferred.resolve(results);
+				});
+			};
+		});
+
+		return deferred.promise;
 	}
 }
 
@@ -87,4 +115,19 @@ app.post('/jobs', function(req, res) {
 	console.log('Job added to queue. Job ID = ' + jobRequest.jobId);
 	res.status(200).send(jobRequest.jobId);
 	jobWorker.processNextJob();
+});
+
+//route for checking job status and getting results
+app.get('/jobs/:jobId', function(req, res) {
+	var jobId = req.params.jobId;
+	if (statusMap[jobId] === "Complete") { //job complete, retrieve results
+		dbWorker.getJobResults(jobId).then(function(jobResults) {
+			res.json(jobResults);
+			console.log(jobResults);
+		});
+	} else if (!statusMap[jobId]) { //job doesn't exist
+
+	} else { //send job status
+		res.status(200).send({jobStatus: statusMap[jobId]});
+	}
 });
