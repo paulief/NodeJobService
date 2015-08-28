@@ -1,0 +1,21 @@
+{
+  "name": "JobService",
+  "version": "1.0.0",
+  "description": "a simple API server to take and return jobs",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "config": "^1.15.0",
+    "cors": "^2.7.1",
+    "express": "^4.13.3",
+    "pg": "^4.4.1",
+    "request": "^2.61.0",
+    "shortid": "^2.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Paul Fagan",
+  "license": "ISC"
+}
