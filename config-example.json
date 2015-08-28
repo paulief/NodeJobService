@@ -1,0 +1,11 @@
+{
+	"Jobs": {
+		"dbConfig": {
+			"host": "dbhost",
+			"port": "1234",
+			"dbName": "db",
+			"username": "username",
+			"password": "password"
+		}
+	}
+}
