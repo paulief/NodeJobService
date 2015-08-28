@@ -37,7 +37,7 @@ var jobWorker = {
 		statusMap[nextJob.jobId] = "In Progress";
 	},
 	requestURL: function(job) {
-		//console.log(url);
+		//need to parse/validate URL
 		request(job.requestedUrl, function(error, response, body) {
 			if (!error && response.statusCode == 200) {
 				dbWorker.saveJobResults(job.jobId, "success", body);
