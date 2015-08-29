@@ -47,4 +47,4 @@ The API endpoints are documented below:
   
 * **Error Response:**
 
-  **Content:** `{error: "Job doesn't exist", message: "Job could not be found, check ID"
+  **Content:** `{error: "Job doesn't exist", message: "Job could not be found, check ID"}`
