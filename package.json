@@ -12,7 +12,7 @@
     "q": "^1.4.1",
     "request": "^2.61.0",
     "shortid": "^2.2.2",
-    "valid-url": "^1.0.9"
+    "validator": "^4.0.5"
   },
   "devDependencies": {},
   "scripts": {
