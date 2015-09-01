@@ -12,7 +12,9 @@ var jobWorker = {
 
 function checkForNewJobs() {
 	if (jobWorker.jobQueue.length > 0) { //jobs present, start working on jobs
-		processNextJob();
+		//Using setImmediate to add to end of node event queue
+		//This way it will prioritize incoming POSTs at the expense of the queue growing faster
+		setImmediate(function() { processNextJob() });
 	} else { //no jobs, keep checking some time later
 		setTimeout(function() {checkForNewJobs()}, 1000);
 	};
@@ -21,10 +23,7 @@ function processNextJob() {
 	var nextJob = jobWorker.jobQueue.shift();
 	requestURL(nextJob);
 	jobWorker.statusMap[nextJob.jobId] = "URL Requested";
-
-	//Using setImmediate to add to end of node event queue
-	//This way it will prioritize incoming POSTs at the expense of the queue growing faster
-	setImmediate(function() { checkForNewJobs() });
+	checkForNewJobs();
 };
 /*
 Successfully stored job results get removed from status map
