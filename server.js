@@ -19,6 +19,8 @@ var server = app.listen(3030, function () {
   console.log('JobService app listening at http://%s:%s', host, port);
 });
 
+jobWorker.startCheckingQueue();
+
 //Route for taking job requests
 app.post('/jobs', function(req, res) {
 	var requestedUrl = req.body.url;
@@ -31,10 +33,9 @@ app.post('/jobs', function(req, res) {
 			requestedUrl: requestedUrl
 		};
 		jobWorker.jobQueue.push(jobRequest);
-		jobWorker.statusMap[jobRequest.jobId] = "In Progress";
+		jobWorker.statusMap[jobRequest.jobId] = "In Queue";
 		console.log('Job added to queue. Job ID = ' + jobRequest.jobId);
 		res.status(200).send(jobRequest.jobId);
-		jobWorker.processNextJob();
 	};
 });
 function checkForProtocol(url) {
